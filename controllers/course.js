@@ -110,11 +110,11 @@ const CourseController = {
   },
   delete: async (req, res) => {
     try {
-      const user = await CourseModel.deleteById(req.params.id);
-      if (!user) {
-        return res.status(400).json({ message: "User not found!" });
+      const course = await CourseModel.deleteById(req.params.id);
+      if (!course) {
+        return res.status(400).json({ message: "Course not found!" });
       }
-      return res.status(200).json({ message: "User deleted successfully!" });
+      return res.status(200).json({ message: "Course deleted successfully!" });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

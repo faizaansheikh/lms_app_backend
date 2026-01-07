@@ -6,6 +6,7 @@ const PORT = 8000;
 const app = express();
 const userRoutes = require('./routes/userRoute')
 const courseRoutes = require('./routes/courseRoute')
+const lessonsRoutes = require('./routes/lessonsRoute')
 const fileUpload = require("express-fileupload");
 
 app.use(fileUpload({
@@ -32,6 +33,7 @@ app.use(bodyParser.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/lessons", lessonsRoutes);
 
 
 app.listen(PORT, () => {

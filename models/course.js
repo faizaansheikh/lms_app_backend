@@ -59,7 +59,7 @@ const CourseModel = {
 
   deleteById: async (id) => {
     const { rows } = await pool.query(
-      "DELETE FROM users WHERE _id = $1 RETURNING *;",
+      "DELETE FROM courses WHERE _id = $1 RETURNING *;",
       [id]
     );
     return rows[0];
@@ -67,7 +67,7 @@ const CourseModel = {
 
   findAll: async () => {
     const { rows } = await pool.query(
-      "SELECT * FROM courses"
+      "SELECT _id, title, author, price, description, thumbnail FROM courses"
     );
     return rows;
   }
