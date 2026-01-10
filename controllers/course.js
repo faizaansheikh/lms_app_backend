@@ -1,7 +1,7 @@
 
 const CourseModel = require("../models/course");
 const cloudinary = require("cloudinary").v2
-
+const fs = require('fs')
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUDNAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -15,6 +15,7 @@ const CourseController = {
     try {
       const file = req.files.thumbnail;
       cloudinary.uploader.upload(file.tempFilePath, async (err, result) => {
+        fs.unlinkSync(file.tempFilePath);
         console.log('result', result);
         const { title, description, author, price, lessons } = req.body;
 
@@ -25,7 +26,7 @@ const CourseController = {
           author,
           price,
           thumbnail: result.url,
-          lessons:JSON.stringify(lessons)
+          lessons: JSON.parse(lessons)
         });
 
         res.status(201).json({
@@ -42,17 +43,17 @@ const CourseController = {
 
 
   update: async (req, res) => {
-    
+
     try {
-      
+
       const file = req?.files?.thumbnail;
       if (file) {
         cloudinary.uploader.upload(file.tempFilePath, async (err, result) => {
-          
+          fs.unlinkSync(file.tempFilePath);
           console.log('result', result);
-          
+
           const { title, description, author, price, lessons } = req.body;
-          
+
           const _id = parseInt(req.params.id, 10);
           const thumbnail = result?.url || null;
           const course = await CourseModel.update({
@@ -62,7 +63,7 @@ const CourseController = {
             author,
             price,
             thumbnail,
-            lessons
+            lessons:JSON.parse(lessons)
           });
 
           res.status(201).json({
@@ -71,9 +72,9 @@ const CourseController = {
           });
         })
       } else {
-        const { _id, title, description, author, price,thumbnail, lessons } = req.body;
+        const { _id, title, description, author, price, thumbnail, lessons } = req.body;
         const course = await CourseModel.update({
-          _id, title, description, author, price, thumbnail, lessons
+          _id, title, description, author, price, thumbnail, lessons:JSON.parse(lessons)
         });
 
         res.status(201).json({
