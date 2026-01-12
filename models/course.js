@@ -16,7 +16,7 @@ const CourseModel = {
     return rows[0];
   },
   update: async (data) => {
-    
+
     const { _id, title, description, author, price, thumbnail, lessons } = data;
 
     const query = `
@@ -70,7 +70,28 @@ const CourseModel = {
       "SELECT _id, title, author, price, description, thumbnail FROM courses"
     );
     return rows;
-  }
+  },
+
+  findLessonsById: async (id) => {
+    const { rows } = await pool.query(
+      `SELECT 
+  COALESCE(
+    json_agg(l.*) 
+      FILTER (WHERE l._id IS NOT NULL), 
+    '[]'
+  ) AS lessons
+FROM courses c
+LEFT JOIN lessons l
+  ON l._id = ANY (
+    SELECT jsonb_array_elements_text(c.lessons)::INT
+  )
+WHERE c._id = $1;`,
+      [id]
+    );
+
+    return rows[0];
+  },
+
 
 };
 

@@ -2,6 +2,8 @@
 const bcrypt = require("bcryptjs");
 const UserModel = require("../models/users");
 const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../helpers.js/helpers");
+const { sendConfirmationEmail } = require("../lib/sendConfirmationEmail");
 
 const UserController = {
 
@@ -9,7 +11,7 @@ const UserController = {
     try {
       const { name, email, password, role } = req.body;
 
-      // check user already exists
+    
       const existingUser = await UserModel.findByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "This email already exists" });
@@ -26,8 +28,18 @@ const UserController = {
         role
       });
 
+      // try {
+      //   await sendConfirmationEmail({
+      //     email: email,
+      //     name: name,
+      //   });
+      // } catch (emailErr) {
+      //   console.error("Email failed to send:", emailErr);
+      // }
+
+
       res.status(201).json({
-        message: "User registered successfully",
+        message: "User registered successfully. Confirmation email sent!",
         user
       });
 

@@ -12,5 +12,7 @@ router.delete("/:id", CourseController.delete); //delete
 router.put("/:id", CourseController.update); //update 
 router.post("/", CourseController.create); //create
 
+router.get("/lessons/:id", CourseController.getLessons); // get lessons
+
 
 module.exports = router;

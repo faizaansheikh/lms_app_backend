@@ -63,7 +63,7 @@ const CourseController = {
             author,
             price,
             thumbnail,
-            lessons:JSON.parse(lessons)
+            lessons: JSON.parse(lessons)
           });
 
           res.status(201).json({
@@ -74,7 +74,7 @@ const CourseController = {
       } else {
         const { _id, title, description, author, price, thumbnail, lessons } = req.body;
         const course = await CourseModel.update({
-          _id, title, description, author, price, thumbnail, lessons:JSON.parse(lessons)
+          _id, title, description, author, price, thumbnail, lessons: JSON.parse(lessons)
         });
 
         res.status(201).json({
@@ -119,7 +119,19 @@ const CourseController = {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
+
+  getLessons: async (req, res) => {
+    try {
+      const course = await CourseModel.findLessonsById(req.params.id);
+      if (!course) {
+        return res.status(404).json({ message: "course not found" });
+      }
+      res.json(course);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };
 
 module.exports = CourseController;
