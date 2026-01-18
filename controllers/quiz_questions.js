@@ -25,7 +25,7 @@ const Quiz_QuestionsController = {
 
     update: async (req, res) => {
         try {
-            
+
             const { _id, question, answers } = req.body;
             const quest = await Quiz_QuestionsModel.update({
                 _id, question, answers
@@ -42,7 +42,9 @@ const Quiz_QuestionsController = {
     },
     getAll: async (req, res) => {
         try {
-            const quiz = await Quiz_QuestionsModel.findAll();
+
+            const { page, size } = req.query
+            const quiz = await Quiz_QuestionsModel.findAll({ page, size });
             res.status(200).json(quiz);
         } catch (error) {
             res.status(500).json({ error: error.message });

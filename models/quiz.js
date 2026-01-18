@@ -1,7 +1,7 @@
 // const pool = require("./connection");
 
 const pool = require("../connection");
-
+const { getTotalRec, getPaginatedData } = require("./utils");
 const QuizModel = {
 
     create: async ({ name, questions }) => {
@@ -50,11 +50,21 @@ RETURNING *;
         return rows[0];
     },
 
-    findAll: async () => {
-        const { rows } = await pool.query(
-            "SELECT * FROM quiz"
+   findAll: async ({ page, size }) => {
+
+        const reqPage = page || 1;
+        const limit = size || 10;
+
+        const offset = (reqPage - 1) * limit;
+
+        const totalRec = await pool.query(
+            getTotalRec('quiz')
         );
-        return rows;
+
+        const query = getPaginatedData('quiz')
+        const values = [limit, offset];
+        const { rows } = await pool.query(query, values);
+        return { data: rows, totalRecords: totalRec?.rows[0].count || null };
     },
 
     findFinalExam: async (id) => {

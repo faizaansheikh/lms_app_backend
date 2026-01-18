@@ -14,4 +14,6 @@ router.post("/register", UserController.create); //create
 
 router.post("/login", UserController.login); //login
 
+router.post("/search", UserController.getFilters); //login
+
 module.exports = router;

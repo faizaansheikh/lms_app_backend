@@ -91,7 +91,8 @@ const CourseController = {
   },
   getAll: async (req, res) => {
     try {
-      const users = await CourseModel.findAll();
+      const { page, size } = req.query
+      const users = await CourseModel.findAll({ page, size });
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -124,18 +125,18 @@ const CourseController = {
 
 
   getLessons: async (req, res) => {
-    
+
     try {
-      
+
       const { userId, courseId } = req.body;
-      
+
       const lessons = await CourseModel.findLessonsById({
         userId, courseId
       });
       if (!lessons) {
         return res.status(404).json({ message: "Lessons not found" });
       }
-      res.json({data:lessons});
+      res.json({ data: lessons });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -1,6 +1,7 @@
 // const pool = require("./connection");
 
 const pool = require("../connection");
+const { getPaginatedData, getTotalRec } = require("./utils");
 
 const UserModel = {
 
@@ -59,12 +60,40 @@ RETURNING _id, name, email, role;
     return rows[0];
   },
 
-  findAll: async () => {
-    const { rows } = await pool.query(
-      "SELECT * FROM users"
+  findAll: async ({ page, size }) => {
+
+    const reqPage = page || 1;
+    const limit = size || 10;
+
+    const offset = (reqPage - 1) * limit;
+
+    const totalRec = await pool.query(
+      getTotalRec('users')
     );
+
+    const query = getPaginatedData('users')
+    const values = [limit, offset];
+    const { rows } = await pool.query(query, values);
+    return { data: rows, totalRecords: totalRec?.rows[0].count || null };
+  },
+
+  findFilterRecords: async ({ col, row }) => {
+    const allowedColumns = ['name', 'email', 'role'];
+
+    if (!allowedColumns.includes(col)) {
+      throw new Error('Invalid column name');
+    }
+
+    const query = `
+    SELECT *
+    FROM users
+    WHERE ${col} ILIKE $1
+  `;
+
+    const { rows } = await pool.query(query, [`%${row}%`]);
+
     return rows;
-  }
+  },
 
 };
 

@@ -1,7 +1,7 @@
 // const pool = require("./connection");
 
 const pool = require("../connection");
-
+const { getTotalRec, getPaginatedData } = require("./utils");
 const Lesson_progressModel = {
 
   create: async ({ user_id, course_id, lesson_id }) => {
@@ -71,11 +71,21 @@ DO UPDATE SET is_completed = TRUE, completed_at = NOW();
     return rows[0];
   },
 
-  findAll: async () => {
-    const { rows } = await pool.query(
-      "SELECT * FROM lesson_progress"
+ findAll: async ({ page, size }) => {
+      const reqPage = page || 1;
+    const limit = size || 10;
+
+    const offset = (reqPage - 1) * limit;
+
+    const totalRec = await pool.query(
+      getTotalRec('lesson_progress')
     );
-    return rows;
+
+    const query = getPaginatedData('lesson_progress')
+    const values = [limit, offset];
+    const { rows } = await pool.query(query, values);
+    return { data: rows, totalRecords: totalRec?.rows[0].count || null };
+   
   },
 
   findLessonsById: async (id) => {

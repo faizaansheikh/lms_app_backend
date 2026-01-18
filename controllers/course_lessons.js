@@ -59,8 +59,8 @@ const Course_LessonsController = {
     },
     getAll: async (req, res) => {
         try {
-
-            const course_lessons = await Course_LessonsModel.findAll();
+            const { page, size } = req.query
+            const course_lessons = await Course_LessonsModel.findAll({ page, size });
             res.status(200).json(course_lessons);
         } catch (error) {
             res.status(500).json({ error: error.message });

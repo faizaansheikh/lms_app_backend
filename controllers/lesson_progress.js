@@ -51,7 +51,8 @@ const Lesson_progressController = {
   },
   getAll: async (req, res) => {
     try {
-      const lesson_progress = await Lesson_progressModel.findAll();
+      const { page, size } = req.query
+      const lesson_progress = await Lesson_progressModel.findAll({ page, size });
       res.status(200).json(lesson_progress);
     } catch (error) {
       res.status(500).json({ error: error.message });

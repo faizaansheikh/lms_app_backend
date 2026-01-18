@@ -1,7 +1,7 @@
 // const pool = require("./connection");
 
 const pool = require("../connection");
-
+const { getTotalRec, getPaginatedData } = require("./utils");
 const CourseModel = {
 
   create: async ({ title, description, author, price, thumbnail }) => {
@@ -64,11 +64,20 @@ const CourseModel = {
     return rows[0];
   },
 
-  findAll: async () => {
-    const { rows } = await pool.query(
-      "SELECT _id, title, author, price, description, thumbnail FROM courses"
+findAll: async ({ page, size }) => {
+    const reqPage = page || 1;
+    const limit = size || 10;
+
+    const offset = (reqPage - 1) * limit;
+
+    const totalRec = await pool.query(
+      getTotalRec('courses')
     );
-    return rows;
+
+    const query = getPaginatedData('courses')
+    const values = [limit, offset];
+    const { rows } = await pool.query(query, values);
+    return { data: rows, totalRecords: totalRec?.rows[0].count || null };
   },
 
   // findLessonsById: async ({ userId, courseId }) => {

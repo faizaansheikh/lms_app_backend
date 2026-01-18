@@ -44,7 +44,8 @@ const LessonsController = {
     },
     getAll: async (req, res) => {
         try {
-            const lessons = await LessonsModel.findAll();
+            const { page, size } = req.query
+            const lessons = await LessonsModel.findAll({ page, size });
             res.status(200).json(lessons);
         } catch (error) {
             res.status(500).json({ error: error.message });

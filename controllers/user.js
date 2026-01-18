@@ -11,7 +11,7 @@ const UserController = {
     try {
       const { name, email, password, role } = req.body;
 
-    
+
       const existingUser = await UserModel.findByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "This email already exists" });
@@ -71,8 +71,14 @@ const UserController = {
     }
   },
   getAll: async (req, res) => {
+
     try {
-      const users = await UserModel.findAll();
+
+      const { page, size } = req.query
+
+      const users = await UserModel.findAll({
+        page, size
+      });
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -141,6 +147,26 @@ const UserController = {
         }
       });
 
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+
+  getFilters: async (req, res) => {
+    try {
+      const { col, row } = req.query; // ✅ FIX
+
+      console.log('welcome', col, row);
+
+      if (!col || !row) {
+        return res.status(400).json({ error: 'col and row are required' });
+      }
+
+      const users = await UserModel.findFilterRecords({ col, row });
+
+      res.status(200).json(users);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: error.message });

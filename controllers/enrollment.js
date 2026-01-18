@@ -32,17 +32,17 @@ const EnrollmentController = {
 
         try {
 
-            
-                const { user_id, course_id, status } = req.body;
-                const enrollment = await EnrollmentModel.update({
-                    user_id, course_id, status
-                });
 
-                res.status(201).json({
-                    message: "Enrollment updated successfully",
-                    enrollment
-                });
-            
+            const { user_id, course_id, status } = req.body;
+            const enrollment = await EnrollmentModel.update({
+                user_id, course_id, status
+            });
+
+            res.status(201).json({
+                message: "Enrollment updated successfully",
+                enrollment
+            });
+
 
 
 
@@ -52,7 +52,8 @@ const EnrollmentController = {
     },
     getAll: async (req, res) => {
         try {
-            const enrollment = await EnrollmentModel.findAll();
+            const { page, size } = req.query
+            const enrollment = await EnrollmentModel.findAll({ page, size });
             res.status(200).json(enrollment);
         } catch (error) {
             res.status(500).json({ error: error.message });

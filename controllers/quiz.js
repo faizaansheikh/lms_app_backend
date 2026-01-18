@@ -46,7 +46,11 @@ const QuizController = {
     },
     getAll: async (req, res) => {
         try {
-            const quiz = await QuizModel.findAll();
+            const { page, size } = req.query
+
+            const quiz = await QuizModel.findAll({
+                page, size
+            });
             res.status(200).json(quiz);
         } catch (error) {
             res.status(500).json({ error: error.message });
