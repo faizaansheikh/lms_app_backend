@@ -15,7 +15,7 @@ const Quiz_QuestionsModel = {
     return rows[0];
   },
   update: async (data) => {
-    
+
     const { _id, question, answers } = data;
 
     const query = `
@@ -57,9 +57,31 @@ RETURNING *;
     );
     return rows[0];
   },
+  findFilterRecords: async ({ col, row }) => {
+    let query;
+    let values;
 
+    if (col === "_id") {
+      query = `
+    SELECT *
+    FROM quiz_questions
+    WHERE _id = $1
+  `;
+      values = [Number(row)];
+    } else {
+      query = `
+    SELECT *
+    FROM quiz_questions
+    WHERE ${col} ILIKE $1
+  `;
+      values = [`%${row}%`];
+    }
+
+    const { rows } = await pool.query(query, values);
+    return rows;
+  },
   findAll: async ({ page, size }) => {
-    
+
     const reqPage = page || 1;
     const limit = size || 10;
 
@@ -73,7 +95,7 @@ RETURNING *;
     const values = [limit, offset];
     const { rows } = await pool.query(query, values);
     return { data: rows, totalRecords: totalRec?.rows[0].count || null };
-   
+
   }
 
 };

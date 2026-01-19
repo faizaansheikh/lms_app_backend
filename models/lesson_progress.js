@@ -43,7 +43,29 @@ DO UPDATE SET is_completed = TRUE, completed_at = NOW();
     return rows[0];
   },
 
+  findFilterRecords: async ({ col, row }) => {
+    let query;
+    let values;
 
+    if (col === "_id" || col === 'course_id' || col === 'lesson_id' ||  col === 'user_id') {
+      query = `
+    SELECT *
+    FROM lesson_progress
+    WHERE ${col} = $1
+  `;
+      values = [Number(row)];
+    } else {
+      query = `
+    SELECT *
+    FROM lesson_progress
+    WHERE ${col} ILIKE $1
+  `;
+      values = [`%${row}%`];
+    }
+
+    const { rows } = await pool.query(query, values);
+    return rows;
+  },
   findById: async (id) => {
     const { rows } = await pool.query(
       `
@@ -65,14 +87,14 @@ DO UPDATE SET is_completed = TRUE, completed_at = NOW();
 
   deleteById: async (id) => {
     const { rows } = await pool.query(
-      "DELETE FROM courses WHERE _id = $1 RETURNING *;",
+      "DELETE FROM lesson_progress WHERE _id = $1 RETURNING *;",
       [id]
     );
     return rows[0];
   },
 
- findAll: async ({ page, size }) => {
-      const reqPage = page || 1;
+  findAll: async ({ page, size }) => {
+    const reqPage = page || 1;
     const limit = size || 10;
 
     const offset = (reqPage - 1) * limit;
@@ -85,7 +107,7 @@ DO UPDATE SET is_completed = TRUE, completed_at = NOW();
     const values = [limit, offset];
     const { rows } = await pool.query(query, values);
     return { data: rows, totalRecords: totalRec?.rows[0].count || null };
-   
+
   },
 
   findLessonsById: async (id) => {

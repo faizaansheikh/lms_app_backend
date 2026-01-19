@@ -6,8 +6,9 @@ const Course_LessonsController = {
 
     create: async (req, res) => {
         try {
+            debugger
             const { course_id, lesson_id, quizid } = req.body;
-            const table = await Course_LessonsModel.findAll();
+            const table = await Course_LessonsModel.find();
             const dups = table?.map(x => x.course_id) || []
 
             if (dups?.includes(course_id)) {
@@ -66,7 +67,22 @@ const Course_LessonsController = {
             res.status(500).json({ error: error.message });
         }
     },
+    getFilters: async (req, res) => {
+        try {
+            const { col, row } = req.query; // ✅ FIX
 
+            if (!col || !row) {
+                return res.status(400).json({ error: 'col and row are required' });
+            }
+
+            const users = await Course_LessonsModel.findFilterRecords({ col, row });
+
+            res.status(200).json(users);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    },
     getById: async (req, res) => {
         try {
             const course_lesson = await Course_LessonsModel.findById(req.params.id);

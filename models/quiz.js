@@ -50,7 +50,7 @@ RETURNING *;
         return rows[0];
     },
 
-   findAll: async ({ page, size }) => {
+    findAll: async ({ page, size }) => {
 
         const reqPage = page || 1;
         const limit = size || 10;
@@ -66,7 +66,29 @@ RETURNING *;
         const { rows } = await pool.query(query, values);
         return { data: rows, totalRecords: totalRec?.rows[0].count || null };
     },
+    findFilterRecords: async ({ col, row }) => {
+        let query;
+        let values;
 
+        if (col === "_id") {
+            query = `
+    SELECT *
+    FROM quiz
+    WHERE _id = $1
+  `;
+            values = [Number(row)];
+        } else {
+            query = `
+    SELECT *
+    FROM quiz
+    WHERE ${col} ILIKE $1
+  `;
+            values = [`%${row}%`];
+        }
+
+        const { rows } = await pool.query(query, values);
+        return rows;
+    },
     findFinalExam: async (id) => {
         const { rows } = await pool.query(
             `

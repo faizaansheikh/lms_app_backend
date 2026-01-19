@@ -81,7 +81,22 @@ const Lesson_progressController = {
       res.status(500).json({ error: error.message });
     }
   },
+  getFilters: async (req, res) => {
+    try {
+      const { col, row } = req.query; // ✅ FIX
 
+      if (!col || !row) {
+        return res.status(400).json({ error: 'col and row are required' });
+      }
+
+      const users = await Lesson_progressModel.findFilterRecords({ col, row });
+
+      res.status(200).json(users);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  },
 
 };
 

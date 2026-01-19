@@ -92,6 +92,7 @@ const CourseController = {
   getAll: async (req, res) => {
     try {
       const { page, size } = req.query
+
       const users = await CourseModel.findAll({ page, size });
       res.status(200).json(users);
     } catch (error) {
@@ -122,7 +123,22 @@ const CourseController = {
     }
   },
 
+  getFilters: async (req, res) => {
+    try {
+      const { col, row } = req.query; // ✅ FIX
 
+      if (!col || !row) {
+        return res.status(400).json({ error: 'col and row are required' });
+      }
+
+      const users = await CourseModel.findFilterRecords({ col, row });
+
+      res.status(200).json(users);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  },
 
   getLessons: async (req, res) => {
 

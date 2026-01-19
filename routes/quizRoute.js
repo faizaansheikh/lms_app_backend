@@ -1,19 +1,20 @@
 const express = require("express");
 const QuizController = require("../controllers/quiz");
+const { verifyJWT } = require("../middlewares/authenticate");
 
 
 const router = express.Router();
 
-router.get("/", QuizController.getAll); //get
-router.get("/:id", QuizController.getById); //single get
+router.get("/", verifyJWT, QuizController.getAll); //get
+router.get("/:id", verifyJWT, QuizController.getById); //single get
 
-router.delete("/:id", QuizController.delete); //delete
+router.delete("/:id", verifyJWT, QuizController.delete); //delete
 
-router.put("/:id", QuizController.update); //update 
-router.post("/", QuizController.create); //create
+router.put("/:id", verifyJWT, QuizController.update); //update 
+router.post("/", verifyJWT, QuizController.create); //create
 
-router.get("/final_exam/:id", QuizController.getFinalExamQuiz); //get
+router.get("/final_exam/:id", verifyJWT, QuizController.getFinalExamQuiz); //get
 
-
+router.post("/search", verifyJWT, QuizController.getFilters);
 
 module.exports = router;

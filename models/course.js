@@ -16,6 +16,30 @@ const CourseModel = {
     const { rows } = await pool.query(query, values);
     return rows[0];
   },
+  findFilterRecords: async ({ col, row }) => {
+    let query;
+    let values;
+
+    if (col === "_id") {
+      query = `
+    SELECT *
+    FROM courses
+    WHERE _id = $1
+  `;
+      values = [Number(row)];
+    } else {
+      query = `
+    SELECT *
+    FROM courses
+    WHERE ${col} ILIKE $1
+  `;
+      values = [`%${row}%`];
+    }
+
+    const { rows } = await pool.query(query, values);
+    return rows;
+
+  },
   update: async (data) => {
 
     const { _id, title, description, author, price, thumbnail } = data;
@@ -64,20 +88,27 @@ const CourseModel = {
     return rows[0];
   },
 
-findAll: async ({ page, size }) => {
-    const reqPage = page || 1;
-    const limit = size || 10;
+  findAll: async ({ page, size }) => {
+    if (page && size) {
+      const reqPage = page || 1;
+      const limit = size || 10;
 
-    const offset = (reqPage - 1) * limit;
+      const offset = (reqPage - 1) * limit;
 
-    const totalRec = await pool.query(
-      getTotalRec('courses')
-    );
+      const totalRec = await pool.query(
+        getTotalRec('courses')
+      );
 
-    const query = getPaginatedData('courses')
-    const values = [limit, offset];
-    const { rows } = await pool.query(query, values);
-    return { data: rows, totalRecords: totalRec?.rows[0].count || null };
+      const query = getPaginatedData('courses')
+      const values = [limit, offset];
+      const { rows } = await pool.query(query, values);
+      return { data: rows, totalRecords: totalRec?.rows[0].count || null };
+    } else {
+      const { rows } = await pool.query('SELECT * FROM courses');
+      return rows
+    }
+
+
   },
 
   // findLessonsById: async ({ userId, courseId }) => {

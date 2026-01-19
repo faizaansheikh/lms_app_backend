@@ -5,31 +5,38 @@ const { getPaginatedData, getTotalRec } = require("./utils");
 
 const UserModel = {
 
-  create: async ({ name, email, password, role }) => {
+  create: async ({ name,
+    email,
+    password,
+    phone,
+    address,
+    role }) => {
     const query = `
-      INSERT INTO users (name, email, password, role)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (name, email, password, phone, address, role)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING _id, name, email, role
     `;
-    const values = [name, email, password, role || "student"];
+    const values = [name, email, password, phone, address, role || "student"];
     const { rows } = await pool.query(query, values);
     return rows[0];
   },
   update: async (data) => {
-    const { _id, name, email, password, role } = data;
+    const { _id, name, email, password, phone, address, role } = data;
 
     const query = `
     UPDATE users
-SET
+    SET
     name     = COALESCE($1, name),      
     email    = COALESCE($2, email),
     password = COALESCE($3, password), 
-    role     = COALESCE($4, role)              
-WHERE _id = $5                                      
-RETURNING _id, name, email, role;
+    phone = COALESCE($4, phone), 
+    address = COALESCE($5, address), 
+    role     = COALESCE($6, role)              
+    WHERE _id = $7                                      
+    RETURNING *;
   `;
 
-    const values = [name, email, password, role, _id];
+    const values = [name, email, password, phone, address, role, _id];
 
     const { rows } = await pool.query(query, values);
     return rows[0];
@@ -46,7 +53,7 @@ RETURNING _id, name, email, role;
 
   findById: async (id) => {
     const { rows } = await pool.query(
-      "SELECT _id, name, email, password, role FROM users WHERE _id = $1",
+      "SELECT * FROM users WHERE _id = $1",
       [id]
     );
     return rows[0];
@@ -78,20 +85,26 @@ RETURNING _id, name, email, role;
   },
 
   findFilterRecords: async ({ col, row }) => {
-    const allowedColumns = ['name', 'email', 'role'];
+    let query;
+    let values;
 
-    if (!allowedColumns.includes(col)) {
-      throw new Error('Invalid column name');
-    }
-
-    const query = `
+    if (col === "_id") {
+      query = `
+    SELECT *
+    FROM users
+    WHERE _id = $1
+  `;
+      values = [Number(row)];
+    } else {
+      query = `
     SELECT *
     FROM users
     WHERE ${col} ILIKE $1
   `;
+      values = [`%${row}%`];
+    }
 
-    const { rows } = await pool.query(query, [`%${row}%`]);
-
+    const { rows } = await pool.query(query, values);
     return rows;
   },
 

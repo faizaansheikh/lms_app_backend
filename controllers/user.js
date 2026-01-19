@@ -9,7 +9,7 @@ const UserController = {
 
   create: async (req, res) => {
     try {
-      const { name, email, password, role } = req.body;
+      const { name, email, password, phone, address, role } = req.body;
 
 
       const existingUser = await UserModel.findByEmail(email);
@@ -25,6 +25,8 @@ const UserController = {
         name,
         email,
         password: hashedPassword,
+        phone,
+        address,
         role
       });
 
@@ -51,13 +53,15 @@ const UserController = {
 
   update: async (req, res) => {
     try {
-      const { _id, name, email, password, role } = req.body;
+      const { _id, name, email, password, phone, address, role } = req.body;
       // update user
       const user = await UserModel.update({
         _id,
         name,
         email,
         password,
+        phone,
+        address,
         role
       });
 

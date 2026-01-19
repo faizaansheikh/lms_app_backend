@@ -71,21 +71,55 @@ const Course_LessonsModel = {
         );
         return rows[0];
     },
+    findFilterRecords: async ({ col, row }) => {
+        let query;
+        let values;
 
-    findAll: async ({ page, size }) => {
-        const reqPage = page || 1;
-        const limit = size || 10;
+        if (col === "_id" || col === 'course_id' || col === 'lesson_id') {
+            query = `
+    SELECT *
+    FROM course_lessons
+    WHERE ${col} = $1
+  `;
+            values = [Number(row)];
+        } else {
+            query = `
+    SELECT *
+    FROM course_lessons
+    WHERE ${col} ILIKE $1
+  `;
+            values = [`%${row}%`];
+        }
 
-        const offset = (reqPage - 1) * limit;
-
-        const totalRec = await pool.query(
-            getTotalRec('course_lessons')
-        );
-
-        const query = getPaginatedData('course_lessons')
-        const values = [limit, offset];
         const { rows } = await pool.query(query, values);
-        return { data: rows, totalRecords: totalRec?.rows[0].count || null };
+        return rows;
+    },
+    find: async () => {
+        const { rows } = await pool.query('SELECT * FROM course_lessons');
+        return rows
+
+    },
+    findAll: async ({ page, size }) => {
+
+        if (page && size) {
+            const reqPage = page || 1;
+            const limit = size || 10;
+
+            const offset = (reqPage - 1) * limit;
+
+            const totalRec = await pool.query(
+                getTotalRec('course_lessons')
+            );
+
+            const query = getPaginatedData('course_lessons')
+            const values = [limit, offset];
+            const { rows } = await pool.query(query, values);
+            return { data: rows, totalRecords: totalRec?.rows[0].count || null };
+        } else {
+            const { rows } = await pool.query('SELECT * FROM course_lessons');
+            return rows
+        }
+
 
     }
 

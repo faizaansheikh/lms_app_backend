@@ -16,8 +16,8 @@ const LessonsModel = {
     return rows[0];
   },
   update: async (data) => {
-    
-    const { _id, title, url, quizId, type} = data;
+
+    const { _id, title, url, quizId, type } = data;
 
     const query = `
     UPDATE lessons
@@ -60,9 +60,31 @@ const LessonsModel = {
     );
     return rows[0];
   },
+  findFilterRecords: async ({ col, row }) => {
+    let query;
+    let values;
 
- findAll: async ({ page, size }) => {
-     const reqPage = page || 1;
+    if (col === "_id") {
+      query = `
+    SELECT *
+    FROM lessons
+    WHERE _id = $1
+  `;
+      values = [Number(row)];
+    } else {
+      query = `
+    SELECT *
+    FROM lessons
+    WHERE ${col} ILIKE $1
+  `;
+      values = [`%${row}%`];
+    }
+
+    const { rows } = await pool.query(query, values);
+    return rows;
+  },
+  findAll: async ({ page, size }) => {
+    const reqPage = page || 1;
     const limit = size || 10;
 
     const offset = (reqPage - 1) * limit;

@@ -60,13 +60,35 @@ RETURNING user_id, course_id, enrolled_at, status;
 
     deleteById: async (id) => {
         const { rows } = await pool.query(
-            "DELETE FROM courses WHERE _id = $1 RETURNING *;",
+            "DELETE FROM enrollments WHERE _id = $1 RETURNING *;",
             [id]
         );
         return rows[0];
     },
+    findFilterRecords: async ({ col, row }) => {
+        let query;
+        let values;
 
-   findAll: async ({ page, size }) => {
+         if (col === "_id" || col === 'course_id' ||  col === 'user_id') {
+            query = `
+    SELECT *
+    FROM enrollments
+    WHERE ${col} = $1
+  `;
+            values = [Number(row)];
+        } else {
+            query = `
+    SELECT *
+    FROM enrollments
+    WHERE ${col} ILIKE $1
+  `;
+            values = [`%${row}%`];
+        }
+
+        const { rows } = await pool.query(query, values);
+        return rows;
+    },
+    findAll: async ({ page, size }) => {
         const reqPage = page || 1;
         const limit = size || 10;
 

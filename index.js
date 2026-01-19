@@ -1,6 +1,7 @@
 
 const express = require("express");
 const cors = require("cors")
+const Stripe =  require("stripe")
 const bodyParser = require('body-parser');
 const PORT = 8000;
 const app = express();
@@ -14,6 +15,8 @@ const quizRoutes = require('./routes/quizRoute')
 const quiz_questions = require('./routes/quiz_questionsRoute')
 
 const fileUpload = require("express-fileupload");
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 app.use(fileUpload({
   useTempFiles:true
@@ -45,6 +48,25 @@ app.use("/api/course_lessons", course_lessonsRoutes);
 app.use("/api/lesson_progress", lessons_progressRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/quiz_questions", quiz_questions);
+
+// stripe
+app.post("/api/create-payment-intent", async (req, res) => {
+  try {
+    const { amount } = req.body; // amount in cents
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: "usd",
+      automatic_payment_methods: { enabled: true },
+    });
+
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 app.listen(PORT, () => {
