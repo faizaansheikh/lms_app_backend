@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get("/", course_desc.getAll); //get
 router.get("/:id",course_desc.getById); //single get
+router.get("/course/:id",course_desc.getCourseDescById); //single course desc
 
 router.delete("/:id", verifyJWT,course_desc.delete); //delete
 

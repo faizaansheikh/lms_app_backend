@@ -153,6 +153,28 @@ const CourseModel = {
   //   return lessons;
   // },
 
+  getCourseFullDetail: async (courseId) => {
+    const query = `
+    SELECT
+      c.*,
+      COALESCE(
+        json_agg(DISTINCT r) FILTER (WHERE r._id IS NOT NULL),
+        '[]'
+      ) AS reviews,
+      COALESCE(
+        json_agg(DISTINCT e) FILTER (WHERE e._id IS NOT NULL),
+        '[]'
+      ) AS events
+    FROM courses c
+    LEFT JOIN reviews r ON r.course_id = c._id
+    LEFT JOIN events e ON e.course_id = c._id
+    WHERE c._id = $1
+    GROUP BY c._id
+  `;
+
+    const { rows } = await pool.query(query, [courseId]);
+    return rows[0];
+  },
 
   findLessonsById: async ({ userId, courseId }) => {
 

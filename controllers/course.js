@@ -139,6 +139,20 @@ const CourseController = {
       res.status(500).json({ error: error.message });
     }
   },
+  getCourseFullDetail: async (req, res) => {
+
+    try {
+
+  
+      const lessons = await CourseModel.getCourseFullDetail(req.params.id);
+      if (!lessons) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      res.json({ data: lessons });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 
   getLessons: async (req, res) => {
 

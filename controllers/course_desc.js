@@ -15,22 +15,31 @@ const course_desc = {
     create: async (req, res) => {
 
         try {
+            
+            const { course_id, description } = req.body;
 
-            const {
-                course_id,
-                description
-            } = req.body;
+            const table = await Course_Desc_Model.findAll({});
+            const dups = table?.map(x => x.course_id) || []
 
-            // create course
-            const course_desc = await Course_Desc_Model.create({
-                course_id,
-                description
-            });
+            if (dups?.includes(course_id)) {
+                return res.status(400).json({ message: "This event is alreay exist in table!" });
+            } else {
 
-            res.status(201).json({
-                message: "Course description added successfully",
-                course_desc
-            });
+                // create course
+                const course_desc = await Course_Desc_Model.create({
+                    course_id,
+                    description
+                });
+
+                res.status(201).json({
+                    message: "Course description added successfully",
+                    course_desc
+                });
+            }
+
+
+
+
 
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -41,10 +50,10 @@ const course_desc = {
     update: async (req, res) => {
 
         try {
-            
-            const { _id, course_id, description } = req.body;
+
+            const { course_id, description } = req.body;
             const course_desc = await Course_Desc_Model.update({
-                _id, course_id, description
+                _id: req.params.id, course_id, description
             });
 
             res.status(201).json({
@@ -72,20 +81,32 @@ const course_desc = {
         try {
             const course = await Course_Desc_Model.findById(req.params.id);
             if (!course) {
-                return res.status(404).json({ message: "course not found" });
+                return res.status(404).json({ message: "course description not found" });
             }
             res.json(course);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     },
+    getCourseDescById: async (req, res) => {
+        try {
+            const course = await Course_Desc_Model.findCourseById(req.params.id);
+            if (!course) {
+                return res.status(404).json({ message: "Course description not found" });
+            }
+            res.json(course);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
     delete: async (req, res) => {
         try {
             const course = await Course_Desc_Model.deleteById(req.params.id);
             if (!course) {
-                return res.status(400).json({ message: "Course not found!" });
+                return res.status(400).json({ message: "Course description not found!" });
             }
-            return res.status(200).json({ message: "Course deleted successfully!" });
+            return res.status(200).json({ message: "Course description deleted successfully!" });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -108,23 +129,7 @@ const course_desc = {
         }
     },
 
-    getLessons: async (req, res) => {
 
-        try {
-
-            const { userId, courseId } = req.body;
-
-            const lessons = await Course_Desc_Model.findLessonsById({
-                userId, courseId
-            });
-            if (!lessons) {
-                return res.status(404).json({ message: "Lessons not found" });
-            }
-            res.json({ data: lessons });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    },
 };
 
 module.exports = course_desc;

@@ -29,11 +29,11 @@ const Course_Desc_Model = {
         let query;
         let values;
 
-        if (col === "_id") {
+        if (col === "_id" || col === "course_id") {
             query = `
     SELECT *
     FROM events
-    WHERE _id = $1
+    WHERE ${col} = $1
   `;
             values = [Number(row)];
         } else {
@@ -50,7 +50,7 @@ const Course_Desc_Model = {
 
     },
     update: async (data) => {
-        
+
         const { _id, course_id, description } = data;
 
         const query = `
@@ -67,7 +67,7 @@ const Course_Desc_Model = {
         ];
 
         const { rows } = await pool.query(query, values);
-        console.log("Updated row test:", rows[0]); 
+        console.log("Updated row test:", rows[0]);
         return rows[0];
     },
 
@@ -79,7 +79,13 @@ const Course_Desc_Model = {
         );
         return rows[0];
     },
-
+    findCourseById: async (id) => {
+        const { rows } = await pool.query(
+            "SELECT * FROM events WHERE course_id = $1",
+            [id]
+        );
+        return rows[0];
+    },
     deleteById: async (id) => {
         const { rows } = await pool.query(
             "DELETE FROM events WHERE _id = $1 RETURNING *;",

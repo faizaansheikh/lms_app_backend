@@ -15,5 +15,9 @@ router.post("/", verifyJWT,CourseController.create); //create
 
 router.post("/lessons", verifyJWT,CourseController.getLessons); // get lessons
 
+router.get("/details/:id",CourseController.getCourseFullDetail); // get details
+
+
+
 router.post("/search", verifyJWT,CourseController.getFilters);
 module.exports = router;

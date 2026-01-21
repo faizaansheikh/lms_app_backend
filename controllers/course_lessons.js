@@ -6,7 +6,7 @@ const Course_LessonsController = {
 
     create: async (req, res) => {
         try {
-            debugger
+            
             const { course_id, lesson_id, quizid } = req.body;
             const table = await Course_LessonsModel.find();
             const dups = table?.map(x => x.course_id) || []
