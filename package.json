@@ -5,10 +5,10 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --inspect index.js"
+    "start": "node --inspect app.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

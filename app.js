@@ -1,9 +1,10 @@
 
+require('dotenv').config()
 const express = require("express");
 const cors = require("cors")
 const Stripe =  require("stripe")
 const bodyParser = require('body-parser');
-const PORT = 8000;
+const PORT = process.env.PORT;
 const app = express();
 const userRoutes = require('./routes/userRoute')
 const courseRoutes = require('./routes/courseRoute')
@@ -13,6 +14,7 @@ const course_lessonsRoutes = require('./routes/course_lessons')
 const lessons_progressRoutes = require('./routes/lesson_progress')
 const quizRoutes = require('./routes/quizRoute')
 const quiz_questions = require('./routes/quiz_questionsRoute')
+const course_desc = require('./routes/course_desc_route')
 
 const fileUpload = require("express-fileupload");
 
@@ -48,6 +50,7 @@ app.use("/api/course_lessons", course_lessonsRoutes);
 app.use("/api/lesson_progress", lessons_progressRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/quiz_questions", quiz_questions);
+app.use("/api/events", course_desc);
 
 // stripe
 app.post("/api/create-payment-intent", async (req, res) => {
